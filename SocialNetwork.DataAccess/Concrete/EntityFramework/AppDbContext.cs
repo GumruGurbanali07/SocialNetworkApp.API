@@ -1,8 +1,7 @@
-﻿
-using SocialNetwork.Core.Configuration;
-using Microsoft.EntityFrameworkCore;
-using SocialNetwork.Entities.Concrete;
+﻿using Microsoft.EntityFrameworkCore;
 using SocialNetwork.Core.Entities.Concrete;
+using SocialNetwork.Entities.Concrete;
+
 
 namespace SocialNetwork.Core.Configuration
 {
@@ -19,6 +18,35 @@ namespace SocialNetwork.Core.Configuration
         public DbSet<User> Users { get; set; }
         public DbSet<Role> Roles { get; set; }
         public DbSet<AppUserRole> AppUserRoles { get; set; }
+
+
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<FriendList>()
+                .HasKey(x => x.Id);
+
+            modelBuilder.Entity<FriendList>()
+                .HasOne(x => x.User)
+                .WithMany(x => x.FriendLists)
+                .HasForeignKey(x => x.FriendId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Comment>()
+               .HasOne(x => x.User)
+               .WithMany()
+               .HasForeignKey(x => x.UserId)
+               .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Reaction>()
+                .HasOne(x => x.User)
+                .WithMany()
+                .HasForeignKey(x => x.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+
+        }
+
 
     }
 }

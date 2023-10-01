@@ -1,9 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using SocialNetwork.Core.Entities.Abstract;
 using System.Linq.Expressions;
 
 namespace SocialNetwork.Core.DataAccess.EntityFramework
 {
-    public class EFRepositoryBase<T, TContext> : IRepositoryBase<T> where T : class where TContext : DbContext, new()
+    public class EFRepositoryBase<T, TContext> : IRepositoryBase<T> where T : class, IEntity where TContext : DbContext, new()
     {
         public void Add(T entity)
         {
