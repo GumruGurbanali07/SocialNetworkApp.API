@@ -1,6 +1,10 @@
 using MassTransit;
+
+using MassTransit.RabbitMqTransport;
 using SocialNetwork.Business.Consumer;
 using SocialNetwork.Business.DependencyResolver;
+using SocialNetwork.Entities.SharedEmail;
+
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.Create();
 // Add services to the container.
@@ -10,7 +14,7 @@ builder.Services.AddMassTransit(config =>
     config.UsingRabbitMq((ctx, cfg) =>
     {
         cfg.Host("amqp://guest:guest@localhost");
-        //cfg.Message<SendEmailCommand>(x => x.SetEntityName("SendEmailCommand"));
+        cfg.Message<SendEmailCommand>(x => x.SetEntityName("SendEmailCommand"));
         //cfg.ReceiveEndpoint("send-email-command", c =>
         //{
         //    c.ConfigureConsumer<ReceiveEmailConsumer>(ctx);

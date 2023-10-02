@@ -48,35 +48,34 @@ namespace SocialNetwork.Business.Concrete
 
         public IResult Register(UserRegisterDTO userRegisterDTO)
         {
-            var result=BusinessRules.Check(CheckAge(userRegisterDTO.Birthday),CheckEmail(userRegisterDTO.Email));
+            var result = BusinessRules.Check(CheckAge(userRegisterDTO.Birthday), CheckEmail(userRegisterDTO.Email));
+
             if (!result.Success)
-            
-                return new SuccessResult();
-            
-            return new ErrorResult();
+                return new ErrorResult();
 
-            var mapUser = _mapper.Map<User>(userRegisterDTO);
-            mapUser.Avatar = "/";
-            mapUser.CoverPhoto="/";
-            mapUser.EmailToken=Guid.NewGuid().ToString();
-
+            var mapToUser = _mapper.Map<User>(userRegisterDTO);
+            mapToUser.Avatar = "/";
+            mapToUser.CoverPhoto = "/";
+            mapToUser.EmailToken = Guid.NewGuid().ToString();
             byte[] passwordHash, passwordSalt;
             Hashing.HashPassword(userRegisterDTO.Password, out passwordHash, out passwordSalt);
-            mapUser.PasswordSalt = passwordSalt;
-            mapUser.PasswordHash = passwordHash;
-            mapUser.EmailExpiresDate = DateTime.Now.AddMinutes(5);
+
+            mapToUser.PasswordHash = passwordHash;
+            mapToUser.PasswordSalt = passwordSalt;
+            // Token Expires Date
+            mapToUser.EmailExpiresDate = DateTime.Now.AddMinutes(5);
 
             SendEmailCommand sendEmailCommand = new()
             {
-                Email = mapUser.Email,
-                Name = mapUser.Name,
-                Surname = mapUser.Surname,
-                Token = mapUser.EmailToken
+                Email = mapToUser.Email,
+                Name = mapToUser.Name,
+                Surname = mapToUser.Surname,
+                Token = mapToUser.EmailToken
             };
             _publishEndpoint.Publish<SendEmailCommand>(sendEmailCommand);
-            _userDAL.Add(mapUser);
-            return new SuccessResult();
 
+            _userDAL.Add(mapToUser);
+            return new SuccessResult();
         }
         public IResult CheckAge(DateTime birthday)
         {
@@ -104,7 +103,18 @@ namespace SocialNetwork.Business.Concrete
 
         public IResult VerifyEmail(string email, string token)
         {
-            throw new NotImplementedException();
+            var result = _userDAL.Get(x => x.Email == email);
+            if (result.EmailToken == token)
+            {
+                if (DateTime.Compare(result.EmailExpiresDate, DateTime.Now) < 0)
+                {
+                    return new SuccessResult();
+                }
+                result.EmailConfirm = true;
+                _userDAL.Update(result);
+                return new SuccessResult();
+            }
+            return new ErrorResult();
         }
     }
 }
