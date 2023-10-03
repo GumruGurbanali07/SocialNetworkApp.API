@@ -18,6 +18,7 @@ namespace SocialNetwork.Business.AutoMapper
             CreateMap<PostShareDTO,Post>().ReverseMap();
             //post-dto first
             //get-class first
+
         }
     }
 }
