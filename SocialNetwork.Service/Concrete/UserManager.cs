@@ -15,6 +15,7 @@ using System.Text;
 using System.Threading.Tasks;
 using SocialNetwork.Entities.SharedEmail;
 using MassTransit;
+using SocialNetwork.Core.Security.JWT;
 
 namespace SocialNetwork.Business.Concrete
 {
@@ -43,7 +44,14 @@ namespace SocialNetwork.Business.Concrete
 
         public IResult Login(UserLoginDTO userLoginDTO)
         {
-            throw new NotImplementedException();
+            var result = BusinessRules.Check(CheckEmailAndPassword(userLoginDTO.Email, userLoginDTO.Password));
+            var user = _userDAL.Get(x => x.Email == userLoginDTO.Email);
+            if (!result.Success)
+                return new ErrorResult();
+
+            var token = TokenGenerator.Token(user, "User");
+
+            return new SuccessResult(token);
         }
 
         public IResult Register(UserRegisterDTO userRegisterDTO)
@@ -94,6 +102,19 @@ namespace SocialNetwork.Business.Concrete
                 return new ErrorResult();
             }
             return new SuccessResult();
+        }
+        public IResult CheckEmailAndPassword(string email, string password)
+        {
+            var user = _userDAL.Get(x => x.Email == email);
+            if (user == null) {
+            return  new ErrorResult();}
+            var result = Hashing.VerifyPassword(password, user.PasswordHash, user.PasswordSalt);
+            if (!result)
+            {
+                return new ErrorResult() ;
+            }
+            return new SuccessResult();
+
         }
 
         public IResult SendEmail()

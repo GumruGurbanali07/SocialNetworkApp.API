@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using SocialNetwork.Entities.Concrete;
+using SocialNetwork.Entities.DTOs.PostDTO;
 using SocialNetwork.Entities.DTOs.UserDTO;
 using System;
 using System.Collections.Generic;
@@ -13,7 +14,10 @@ namespace SocialNetwork.Business.AutoMapper
     {
         public MapperProfile()
         {
-            CreateMap<User, UserRegisterDTO>().ReverseMap();
+            CreateMap<UserRegisterDTO,User>().ReverseMap();
+            CreateMap<PostShareDTO,Post>().ReverseMap();
+            //post-dto first
+            //get-class first
         }
     }
 }

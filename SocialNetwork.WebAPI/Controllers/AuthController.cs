@@ -34,6 +34,16 @@ namespace SocialNetwork.WebAPI.Controllers
             }
             return BadRequest(result);
         }
+        [HttpPost("login")]
+        public IActionResult Login([FromBody] UserLoginDTO userLoginDTO)
+        {
+            var result=_userService.Login(userLoginDTO);
+                if (result.Success)
+            {
+                return Ok(result);
+            }
+                return BadRequest(result);
+        }
 
 
     }
