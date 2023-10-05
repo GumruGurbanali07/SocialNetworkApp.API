@@ -19,7 +19,8 @@ namespace SocialNetwork.Business.DependencyResolver
             services.AddScoped<IUserDAL, EFUserDAL>();
             services.AddScoped<IPostService, PostManager>();
             services.AddScoped<IPostDAL, EFPostDAL>();
-
+            services.AddScoped<ICommentService, CommentManager>();
+            services.AddScoped<ICommentDAL, EFCommentDAL>();
             services.AddTransient<IMailHelper, MailHelper>();
             var mapperConfig = new MapperConfiguration(mc =>
             {
